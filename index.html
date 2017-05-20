@@ -1,2 +1,615 @@
-hello
+<!DOCTYPE html>
+<html>
+<head>
+<title>Matt Streeter</title>
+<style>
+    header {
+        position: fixed;
+        top: 0px;
+        background-color: white;
+        z-index: 100;
+    }
+    .centered {
+        width: 980px;
+        left:50%;
+        margin-left: -490px;
+    }
+    td {
+        vertical-align: top;
+    }
+    .paper-title {
+        font-family: Didot,Georgia,serif;
+        font-weight: bold;
+        font-style: normal;
+        font-size: 30px;
+        text-decoration: none;
+        color: black;
+    }
+    .main-title {
+        font-family: Didot,Georgia,serif;
+        font-weight: bold;
+        font-style: normal;
+        font-size: 30px;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 45px;
+    }
+    #primary-nav {
+        margin-bottom: 30px;
+        border-width: 1px 0px 1px 0px;
+        border-color: gray;
+        border-style: solid;
+    }
+    #primary-nav, #topic-nav {
+        font-family: Helvetica,Arial;
+        font-weight: bold;
+        font-size: 18px;
+        text-align: center;
+    }
+    ul {
+        list-style-type: none;
+    }
+    #primary-nav {
+        margin: 0px 30px 0px 30px;
+    }
+    #primary-nav ul {
+        padding-left: 0px;
+    }
+    #primary-nav ul li {
+        display: inline;
+    }
+    #primary-nav a {
+        text-decoration: none;
+        color: black;
+        padding: 15px 30px 15px 30px;
+    }
+    #primary-nav .selected {
+        background-color: black;
+        color: white;
+    }
+    #primary-nav a:hover {
+        background-color: black;
+        color: white;
+    }
+    #primary-nav-research {
+        position: absolute;
+        left: 30px;
+        width: 130px;
+        display: inline-block;
+    }
+    #primary-nav-bio {
+        display: inline-block;
+    }
+    #primary-nav-contact {
+        position: absolute;
+        right: 30px;
+    }
+    #papers, #bio {
+        margin-top: 200px;
+    }
+    #topic-nav {
+        width: 250px;
+        float: left;
+        position: fixed;
+        padding-top: 30px;
+    }
+    #topic-nav ul li {
+        padding-bottom: 45px;
+        width: 150px;
+    }
+    #topic-nav a {
+        color: black;
+        text-decoration: none;
+        display: inline-block;
+        padding-bottom: 15px;
+        border-style: solid;
+        border-width: 0px 0px 2px 0px;
+        border-color: white;
+        width: 130px;
+    }
+    #topic-nav a:hover, #topic-nav .selected {
+        border-color: black;
+    }
+    #paper-table {
+        margin-left: -240px;
+        left: 50%;
+        position: absolute;
+    }
+    .paper-info {
+        padding-left: 20px;
+        width: 450px;
+    }
+    .paper td {
+        padding-bottom: 30px;
+    }
+    .paper-with {
+        padding-top: 15px;
+        font-family: Helvetica,Arial;
+        font-weight: 300;
+        font-size: 16px;
+        color: gray;
+        width: 300px;
+    }
+    .paper-conference {
+        font-style: italic;
+    }
+    #bio {
+        display: none;
+        font-family: Didot,Georgia,serif;
+        font-size: 18px;
 
+        position: absolute;
+    }
+    #bio a {
+        text-decoration: none;
+    }
+    #bio a:hover {
+        text-decoration: underline;
+    }
+    #bio-text {
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+    #container {
+        width: 1000px;
+        margin-left: -500px;
+        left: 50%;
+    }
+</style>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
+<script>
+function selectResearch() {
+    $('#primary-nav a').removeClass('selected');
+    $('#bio').hide();
+    $('#papers').show();
+    $('#primary-nav-research').addClass('selected');
+    recenter();
+    updateTopicNav();
+}
+
+function selectBio() {
+    $('#primary-nav a').removeClass('selected');
+    $('#papers').hide();
+    $('#bio').show();
+    $('#primary-nav-bio').addClass('selected');
+    recenter();
+}
+
+function getCategoryBoundaries() {
+    var boundaries = {};
+    var self = this;
+    $('.paper-title').each(function() {
+        var i = $(this).data('category-index');
+        var top = $(this).position().top;
+        if (!(i in boundaries) || top < boundaries[i])
+            boundaries[i] = top;
+    });
+    return boundaries;
+}
+
+var animating = false;
+
+function topicNav(id) {
+    var i = parseInt($(id).data('index'));
+    var old_top = $(document).scrollTop();
+    var new_top = getCategoryBoundaries()[i];
+    var delta = Math.abs(old_top - new_top);
+    var timeMillis = Math.min(1000, delta / 3);
+    animating = true;
+    $('html, body').animate(
+        {scrollTop: new_top},
+        timeMillis,
+        function() { animating = false; });
+    $('#topic-nav a').removeClass('selected');
+    $(id).addClass('selected');
+}
+
+function updateTopicNav() {
+    if (animating)
+        return;
+
+    var s = $(document).scrollTop();
+    var boundaries = getCategoryBoundaries();
+    var i = 0;
+    while (i+1 in boundaries && s >= boundaries[i+1])
+        i += 1;
+
+    var selected = $('#category-' + i);
+    if (!selected.hasClass('selected')) {
+        $('#topic-nav a').removeClass('selected');
+        selected.addClass('selected');
+    }
+}
+
+function recenter() {
+    var left = Math.max(0, ($(window).width() - 980)/2);
+    $('.centered').offset({left: left});
+}
+
+var lastScrollLeft = 0;
+function maybeRecenter() {
+    var curScrollLeft = $(document).scrollLeft();
+    if (curScrollLeft != lastScrollLeft) {
+        recenter();
+        lastScrollLeft = curScrollLeft;
+    }
+}
+
+$(document).scroll(updateTopicNav);
+$(document).scroll(maybeRecenter);
+$(window).resize(recenter);
+$(document).ready(recenter);
+
+</script>
+</head>
+
+<body>
+<header class="centered">
+    <div class="main-title">Matthew Streeter</div>
+    <div id="primary-nav">
+        <a id="primary-nav-research" href="javascript:selectResearch();" class="selected">RESEARCH</a>
+        <a id="primary-nav-bio" href="javascript:selectBio();">BIO</a>
+        <a id="primary-nav-contact" href="mailto:matts@cs.cmu.edu">CONTACT</a>
+    </nav>
+</header>
+
+<section id="bio" class="centered">
+    <div id="bio-text">
+    <p>Since 2012 I've been working at <a href="http://www.duolingo.com" target="_blank">Duolingo</a>,
+        where I currently lead a team devoted to optimizing learning efficacy.  From 2008-2012
+        I worked on AdWords at <A HREF="http://www.google.com" target="_blank">Google</A>.</p>
+
+    <p>In December 2007 I graduated from the CMU Computer Science PhD program, after defending my <A HREF="thesis/index.html" target="_blank">thesis</A>.
+    I then spent a semester as a postdoc in the CMU Robotics Institute, working with my graduate
+    advisor <A HREF="http://www.cs.cmu.edu/~sfs" target="_blank">Stephen Smith</A>.</p>
+
+    <p>Before coming to CMU I worked with John Koza at <A HREF="http://www.genetic-programming.com" target="_blank">Genetic Programming, Inc.</A>
+        using evolutionary algorithms to synthesize analog electrical circuits.  In 2005 we received a
+        <A HREF="http://www.cs.cmu.edu/~matts/Research/mkeane_US06847851.pdf" target="_blank">patent</A> for one of our
+        evolved circuits.  It is one of the first patents ever granted for a machine-generated invention, and has prompted
+        a <A HREF="http://www.automatinginvention.com/archives/2005/07/a_software_pate_2.html" target="_blank">patent law puzzle</A>
+        as well as some <A HREF="http://www.rae.org/pdf/compevol.pdf" target="_blank">theological confusion</A>.</p>
+    </div>
+</section>
+
+<section id="papers" class="centered">
+    <nav id="topic-nav" class="centered">
+        <ul>
+                <li><a href="javascript:;" onclick="topicNav(this);" id="category-0" data-index="0" class="selected">ONLINE ALGORITHMS</a></li>
+                <li><a href="javascript:;" onclick="topicNav(this);" id="category-1" data-index="1" >ALGORITHM PORTFOLIOS</a></li>
+                <li><a href="javascript:;" onclick="topicNav(this);" id="category-2" data-index="2" >MAX <I>K</I>-ARMED BANDIT</a></li>
+                <li><a href="javascript:;" onclick="topicNav(this);" id="category-3" data-index="3" >JOB SHOP SCHEDULING</a></li>
+                <li><a href="javascript:;" onclick="topicNav(this);" id="category-4" data-index="4" >GENETIC ALGORITHMS</a></li>
+        </ul>
+
+    </nav>
+    <table id="paper-table">
+                <tr class="paper">
+                    <td>
+                        <a href="https://s3.amazonaws.com/duolingo-papers/publications/streeter.edm15.pdf" target="_blank"><img src="curves.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="https://s3.amazonaws.com/duolingo-papers/publications/streeter.edm15.pdf" target="_blank" data-category-index="0">Mixture modeling of<br>individual learning curves</a></div>
+                        <div class="paper-with">
+                            
+                            Best Paper, 
+                            <span class="paper-conference">EDM 2015</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mcmahan_delay_tolerant.pdf" target="_blank"><img src="datacenter.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mcmahan_delay_tolerant.pdf" target="_blank" data-category-index="0">Delay-tolerant algorithms<br>for asynchronous<br>distributed online learning</a></div>
+                        <div class="paper-with">
+                            with Brendan McMahan, 
+                            
+                            <span class="paper-conference">NIPS 2014</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_unconstrained.pdf" target="_blank"><img src="galaxy.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_unconstrained.pdf" target="_blank" data-category-index="0">No-regret algorithms<br>for unconstrained<br>online convex optimization</a></div>
+                        <div class="paper-with">
+                            with Brendan McMahan, 
+                            
+                            <span class="paper-conference">NIPS 2012</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mcmahan_adaptive_bound_optimization.pdf" target="_blank"><img src="piano.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mcmahan_adaptive_bound_optimization.pdf" target="_blank" data-category-index="0">Adaptive bound optimization<br>for online convex<br>optimization</a></div>
+                        <div class="paper-with">
+                            with Brendan McMahan, 
+                            
+                            <span class="paper-conference">COLT 2010</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_nips_2009.pdf" target="_blank"><img src="times_square.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_nips_2009.pdf" target="_blank" data-category-index="0">Online learning of<br>assignments</a></div>
+                        <div class="paper-with">
+                            with Daniel Golovin and Andreas Krause, 
+                            
+                            <span class="paper-conference">NIPS 2009</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mcmahan_colt_2009.pdf" target="_blank"><img src="socrates.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mcmahan_colt_2009.pdf" target="_blank" data-category-index="0">Tighter bounds for<br>multi-armed bandits<br>with expert advice</a></div>
+                        <div class="paper-with">
+                            with Brendan McMahan, 
+                            
+                            <span class="paper-conference">COLT 2009</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_nips_2008.pdf" target="_blank"><img src="mountain.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_nips_2008.pdf" target="_blank" data-category-index="0">An online algorithm<br>for maximizing<br>submodular functions</a></div>
+                        <div class="paper-with">
+                            with Daniel Golovin, 
+                            
+                            <span class="paper-conference">NIPS 2008</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_uai_2008.pdf" target="_blank"><img src="gears.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_uai_2008.pdf" target="_blank" data-category-index="1">New techniques for<br>algorithm portfolio<br>design</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">UAI 2008</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_aaai_2007a.pdf" target="_blank"><img src="dna.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_aaai_2007a.pdf" target="_blank" data-category-index="1">Combining multiple<br>heuristics online</a></div>
+                        <div class="paper-with">
+                            with Daniel Golovin and Stephen Smith, 
+                            
+                            <span class="paper-conference">AAAI 2007</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_aaai_2007b.pdf" target="_blank"><img src="symphony.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_aaai_2007b.pdf" target="_blank" data-category-index="1">Restart schedules<br>for ensembles<br>of problem instances</a></div>
+                        <div class="paper-with">
+                            with Daniel Golovin and Stephen Smith, 
+                            
+                            <span class="paper-conference">AAAI 2007</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_icaps_2007.pdf" target="_blank"><img src="supreme_court.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_icaps_2007.pdf" target="_blank" data-category-index="1">Using decision procedures<br>efficiently<br>for optimization</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">ICAPS 2007</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_cp_2006.pdf" target="_blank"><img src="casino.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_cp_2006.pdf" target="_blank" data-category-index="2">A simple distribution-free<br>approach to the Max<br><I>k</I>-Armed Bandit problem</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">CP 2006</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_aaai_2006.pdf" target="_blank"><img src="slot_machines.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_aaai_2006.pdf" target="_blank" data-category-index="2">An asymptotically optimal algorithm for the Max<br><I>k</I>-Armed Bandit problem</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">AAAI 2006</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_icaps_2006.pdf" target="_blank"><img src="flashlight_search.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_icaps_2006.pdf" target="_blank" data-category-index="3">Exploiting the power of local search in a branch and bound algorithm for job shop scheduling</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">ICAPS 2006</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_jair_2006.pdf" target="_blank"><img src="landscape.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_jair_2006.pdf" target="_blank" data-category-index="3">How the landscape of random job shop scheduling instances depends on the ratio of jobs to machines</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">Journal of Artificial Intelligence Research, 2006</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_icaps_2005.pdf" target="_blank"><img src="waterfalls.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_icaps_2005.pdf" target="_blank" data-category-index="3">Characterizing the distribution of low-makespan schedules in the job shop scheduling problem</a></div>
+                        <div class="paper-with">
+                            with Stephen Smith, 
+                            
+                            <span class="paper-conference">ICAPS 2005</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_gecco_2004.pdf" target="_blank"><img src="nebula.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_gecco_2004.pdf" target="_blank" data-category-index="4">Upper bounds on the time and space complexity of optimizing additively separable functions</a></div>
+                        <div class="paper-with">
+                            
+                            
+                            <span class="paper-conference">GECCO 2004</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_gecco_2003.pdf" target="_blank"><img src="landscape2.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_gecco_2003.pdf" target="_blank" data-category-index="4">Two broad classes of functions for which a No Free Lunch result does not hold</a></div>
+                        <div class="paper-with">
+                            
+                            
+                            <span class="paper-conference">GECCO 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="http://www.genetic-programming.org/gpbook4toc.html" target="_blank"><img src="dna_swarm.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="http://www.genetic-programming.org/gpbook4toc.html" target="_blank" data-category-index="4">Genetic Programming IV: Routine Human-Competitive Machine Intelligence</a></div>
+                        <div class="paper-with">
+                            with John Koza, Martin Keane, Bill Mydlowec, Jessen Yu, and Guido Lanza, 
+                            
+                            <span class="paper-conference">Kluwer Academic Publishers, 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="http://www.scientificamerican.com/article/evolving-inventions/" target="_blank"><img src="circuit2.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="http://www.scientificamerican.com/article/evolving-inventions/" target="_blank" data-category-index="4">Evolving Inventions</a></div>
+                        <div class="paper-with">
+                            with John Koza and Martin Keane, 
+                            
+                            <span class="paper-conference">Scientific American, 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="http://www.genetic-programming.com/jkpdf/ieee2003intelligent.pdf" target="_blank"><img src="robot.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="http://www.genetic-programming.com/jkpdf/ieee2003intelligent.pdf" target="_blank" data-category-index="4">What's AI done for me lately?  Genetic programming's<br>human-competitive results</a></div>
+                        <div class="paper-with">
+                            with John Koza and Martin Keane, 
+                            
+                            <span class="paper-conference">IEEE Intelligent Systems, 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="http://link.springer.com/article/10.1023%2FA%3A1025176407779" target="_blank"><img src="bean_machine.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="http://link.springer.com/article/10.1023%2FA%3A1025176407779" target="_blank" data-category-index="4">Automated discovery of<br>numerical approximation<br>formulae via<br>genetic programming</a></div>
+                        <div class="paper-with">
+                            with Lee Becker, 
+                            
+                            <span class="paper-conference">Genetic Programming and Evolvable Machines, 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_eurogp_2003.pdf" target="_blank"><img src="redwoods.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_eurogp_2003.pdf" target="_blank" data-category-index="4">The root causes of code growth in genetic programming</a></div>
+                        <div class="paper-with">
+                            
+                            
+                            <span class="paper-conference">EuroGP 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_icons_2003.pdf" target="_blank"><img src="cockpit.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_icons_2003.pdf" target="_blank" data-category-index="4">Automatic synthesis using genetic programming of improved PID tuning rules</a></div>
+                        <div class="paper-with">
+                            with Martin Keane and John Koza, 
+                            
+                            <span class="paper-conference">ICONS 2003</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mstreeter_gecco_2002.pdf" target="_blank"><img src="circuit.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mstreeter_gecco_2002.pdf" target="_blank" data-category-index="4">Iterative refinement of computational circuits using genetic programming</a></div>
+                        <div class="paper-with">
+                            with Martin Keane and John Koza, 
+                            
+                            <span class="paper-conference">GECCO 2002</span></div>
+                    </td>
+                </tr>
+                <tr class="paper">
+                    <td>
+                        <a href="Research/mkeane_ehw_2002.pdf" target="_blank"><img src="factory.jpg" width="250"></a>
+                    </td>
+                    <td class="paper-info">
+                        <div><a class="paper-title" href="Research/mkeane_ehw_2002.pdf" target="_blank" data-category-index="4">Automatic synthesis of an improved general-purpose controller for industrially-representative plants</a></div>
+                        <div class="paper-with">
+                            with Martin Keane and John Koza, 
+                            
+                            <span class="paper-conference">Evolvable Hardware 2002</span></div>
+                    </td>
+                </tr>
+    </table>
+</section>
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript" language="javascript">
+var sc_project=1751326;
+var sc_invisible=1;
+var sc_partition=16;
+var sc_security="07acee87";
+</script>
+
+<script type="text/javascript" language="javascript" src="http://www.statcounter.com/counter/counter.js"></script><noscript><a href="http://www.statcounter.com/" target="_blank"><img  src="http://c17.statcounter.com/counter.php?sc_project=1751326&amp;java=0&amp;security=07acee87&amp;invisible=1" alt="free hit counter code" border="0"></a> </noscript>
+<!-- End of StatCounter Code -->
+
+</body>
+
+</html>
