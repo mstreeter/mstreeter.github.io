@@ -1,0 +1,53 @@
+<TITLE>Matt's thesis proposal</TITLE>
+
+<BODY BGCOLOR="#213365" TEXT="white" LINK="yellow" VLINK="yellow">
+
+<BASE href="http://www.cs.cmu.edu/~matts/thesis/proposal.html">
+
+<FONT SIZE=4>
+
+<HR>
+
+<CENTER>
+<H1>Online Selection, Adaptation, and Hybridization of Algorithms</H1>
+<H2>(Thesis proposal)</H2>
+<H2>Matt Streeter</H2>
+</CENTER>
+
+We propose to develop black-box techniques for improving the performance of algorithms by adapting them to the sequence of problem instances on which they are run.  In particular, we propose to develop effective strategies for solving the following four problems:
+<OL>
+	<LI>  <I>Combining multiple heuristics online.</I>  Given <I>k</I> (randomized) algorithms, we seek to learn online a policy for interleaving and restarting them in order to solve a sequence of instances as quickly as possible.
+	<LI> <I>Online reduction from optimization to decision.</I> Given a sequence of instances of an optimization problem and an oracle for the corresponding decision problem, we seek to find a provably (approximately) optimal solution to each instance while minimizing the CPU time consumed by all oracle calls.
+	<LI> <I>Online tuning of branch and bound algorithms.</I> Given a branch and bound algorithm with a number of parameters (e.g., choices of relaxations, constraint propagators), we seek to determine near-optimal parameter settings online.
+  <LI> <I>The max k-armed bandit problem.</I>  In this variant of the classical <I>k</I>-armed bandit problem one seeks to maximize the highest payoff received on any single pull, rather than the total payoff.  A strategy for solving the max <I>k</I>-armed bandit problem can be used to allocate trials among multi-start optimization heuristics.
+</OL>
+For each problem, we prove the existence of a no-regret strategy.  We show experimentally that our strategy for combining multiple heuristics online has the potential to improve the performance of state-of-the-art SAT solvers and A.I. planners, and that our max <I>k</I>-armed bandit strategy effectively allocates trials among multi-start heuristics for the resource-constrained project scheduling problem.
+
+<BR><BR><B>Committee:</B>
+<BR>Stephen Smith, Chair
+<BR>Avrim Blum
+<BR>Tuomas Sandholm
+<BR>Carla Gomes, Cornell University
+<BR>John Hooker, CMU Tepper School of Business
+
+<BR>
+<BR>Read the full <A HREF="proposal.pdf">proposal</A>.  Then view the slides in <A HREF="proposal_slides.pdf">PDF</A> or <A HREF="proposal_slides.mov">QuickTime</A>.
+
+</FONT>
+
+<HR>
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript" language="javascript">
+var sc_project=1773097; 
+var sc_invisible=1; 
+var sc_partition=16; 
+var sc_security="552ddfce"; 
+</script>
+
+<script type="text/javascript" language="javascript" src="http://www.statcounter.com/counter/counter.js"></script><noscript><a href="http://www.statcounter.com/" target="_blank"><img  src="http://c17.statcounter.com/counter.php?sc_project=1773097&amp;java=0&amp;security=552ddfce&amp;invisible=1" alt="counter free hit unique web" border="0"></a> </noscript>
+<!-- End of StatCounter Code -->
+
+</BODY>
+
+</HTML>

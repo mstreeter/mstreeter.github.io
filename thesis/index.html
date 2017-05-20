@@ -1,0 +1,55 @@
+<TITLE>Matt's Ph.D. thesis</TITLE>
+
+<BODY BGCOLOR="#213365" TEXT="white" LINK="yellow" VLINK="yellow">
+
+<BASE href="http://www.cs.cmu.edu/~matts/thesis/proposal.html">
+
+<FONT SIZE=4>
+
+<HR>
+
+<CENTER>
+<H1>Using Online Algorithms to Solve NP-Hard Problems More Efficiently in Practice</H1>
+<H2>Matthew Streeter</H2>
+</CENTER>
+
+<B>Abstract.</B> This thesis develops online algorithms that can be used to solve a wide variety of NP-hard problems more efficiently in practice.  The common approach taken by all our online algorithms is to improve the performance of one or more existing algorithms for a specific NP-hard problem by adapting the algorithms to the sequence of problem instance(s) they are run on.
+
+<BR><BR>We begin by presenting an algorithm for solving a specific class of online resource allocation problems.  Our online algorithm can be applied in environments where abstract <I>jobs</I> arrive one at a time, and one can complete the jobs by investing time in a number of abstract <I>activities</I>.  Provided the jobs and activities satisfy certain technical conditions, our online algorithm is guaranteed to perform almost as well as any fixed schedule for investing time in the various activities, according to two natural measures of performance: (<I>i</I>) the average time required to complete each job, and (<I>ii</I>) the number of jobs completed within time <I>T</I>, for some fixed deadline <I>T > 0</I>.  
+
+<BR><BR>In particular, our online algorithm's guarantees apply if the job can be written as a monotone, submodular function of a set of pairs of the form <I>(v,t)</I>, where <I>t</I> is the time invested in activity <I>v</I>.  Under the first objective, the offline version of this problem generalizes <I>Min-Sum Set Cover</I> and the related <I>Pipelined Set Cover</I> problem.  Under the second objective, the offline version of this problem generalizes the problem of maximizing a monotone, submodular set function subject to a knapsack constraint.  Our online algorithm has potential applications in a number of areas, including the design of algorithm portfolios, database query processing, and sensor placement.
+
+<BR><BR>We apply this online algorithm to the following problem.  We are given <I>k</I> algorithms, and are fed, one at a time, a sequence of problem instances to solve.  We may solve each instance using any of the <I>k</I> algorithms, we may interleave the execution of the algorithms, and, if the algorithms are randomized, we may periodically restart them with a fresh random seed.  Our goal is to minimize the total CPU time required to solve all the instances.  Using data from eight recent solver competitions, we show that our online algorithm and its offline counterpart can be used to improve the performance of state-of-the-art solvers in a number of problem domains, including Boolean satisfiability, zero-one integer programming, constraint satisfaction, and theorem proving.
+
+<BR><BR>We next present an online algorithm that can be used to improve the performance of algorithms that solve an optimization problem by making a sequence of calls to a decision procedure that answers questions of the form "Is there a solution of cost at most <I>k</I>?"  We present an adaptive strategy for determining the sequence of questions to ask, along with bounds on the maximum time to spend waiting for an answer to each question.  Under the assumption that the time required by the decision procedure to return an answer increases as <I>k</I> gets closer to the optimal solution cost, our strategy's performance is near-optimal when measured in terms of a natural competitive ratio.  Experimentally, we show that applying our strategy to recent algorithms for A.I. planning and job shop scheduling allows the algorithms to find approximately optimal solutions more quickly.
+
+<BR><BR>Lastly, we develop algorithms for solving the max <I>k</I>-armed bandit problem, a variant of the classical <I>k</I>-armed bandit problem in which one seeks to maximize the highest payoff received on any single trial, rather than the cumulative payoff.  A strategy for solving the max <I>k</I>-armed bandit problem can be used to allocate trials among multi-start optimization heuristics.  Motivated by results in extreme value theory, we present a no-regret strategy for the special case in which each arm returns payoffs drawn from a generalized extreme value distribution.  We also present a heuristic strategy that solves the max <I>k</I>-armed bandit problem using a strategy for the classical <I>k</I>-armed bandit problem as a subroutine.  Experimentally, we show that our max <I>k</I>-armed bandit strategy can be used to effectively allocate trials among multi-start heuristics for the RCPSP/max, a difficult real-world scheduling problem.
+
+<BR><BR><B>Committee:</B>
+<BR>Stephen Smith, Chair
+<BR>Avrim Blum
+<BR>Tuomas Sandholm
+<BR>Carla Gomes, Cornell University
+<BR>John Hooker, CMU Tepper School of Business
+
+<BR>
+<BR>Read the <A HREF="thesis.pdf">entire thesis</A>, or take a look at the <A HREF="thesis_slides.pdf">slides</A>.
+
+</FONT>
+
+<HR>
+
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=3382783; 
+var sc_invisible=1; 
+var sc_partition=37; 
+var sc_security="7803a8b7"; 
+</script>
+
+<script type="text/javascript" src="http://www.statcounter.com/counter/counter_xhtml.js"></script><noscript><div class="statcounter"><a class="statcounter" href="http://www.statcounter.com/"><img class="statcounter" src="http://c38.statcounter.com/3382783/0/7803a8b7/1/" alt="screen resolution stats" /></a></div></noscript>
+<!-- End of StatCounter Code -->
+
+</BODY>
+
+</HTML>
